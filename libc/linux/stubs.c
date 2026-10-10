@@ -19,7 +19,6 @@ void timer_delete() { printerror("timer_delete"); }
 void timer_create() { printerror("timer_create"); }
 void __timer_gettime50() { printerror("__timer_gettime50"); }
 void __timer_settime50() { printerror("__timer_settime50"); }
-void __pselect50() { printerror("__pselect50"); }
 void __msgctl50() { printerror("__msgctl50"); }
 void __semctl50() { printerror("__semctl50"); }
 void ____semctl50() { printerror("____semctl50"); }

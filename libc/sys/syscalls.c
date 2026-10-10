@@ -974,6 +974,13 @@ _ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout, const si
 	return syscall(SYS_ppoll, fds, nfds, timeout, sigmask);
 }
 
+int
+__pselect50(int n, fd_set *restrict rfds, fd_set *restrict wfds, fd_set *restrict efds, const struct timespec *restrict ts, const sigset_t *restrict mask)
+{
+	long data[2] = { mask, 8 };
+	return syscall(SYS_select, n, rfds, wfds, efds, (tv) ? ((long[]){tv->tv_sec, tv->tv_usec}) : 0, data);
+}
+
 /*
  * syscalls: 281-291
  * (not implemented)
