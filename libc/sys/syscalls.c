@@ -872,8 +872,14 @@ __sigsuspend14(const sigset_t *mask)
 	return syscall(SYS_rt_sigsuspend, mask, 8);
 }
 
+int
+__sigaltstack14(const stack_t *restrict ss, stack_t *restrict old)
+{
+	return syscall(SYS_sigaltstack, ss, old);
+}
+
 /*
- * syscalls: 131-132
+ * syscalls: 132
  * (not implemented)
 */
 

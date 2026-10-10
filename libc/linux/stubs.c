@@ -1,53 +1,35 @@
 #warning "These functions are stubs and this is dangerous. You must implement them the fastest you can"
 
-#include <sys/syscall.h>
-#include <sys/cdefs.h>
-#include <signal.h>
-#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-#ifdef __strong_alias
-__strong_alias(__adjtime50, __stub_libc_err);
-__strong_alias(__aio_suspend50, __stub_libc_err);
-__strong_alias(__lfs_segwait50, __stub_libc_err);
-__strong_alias(__mq_timedreceive50, __stub_libc_err);
-__strong_alias(__mq_timedsend50, __stub_libc_err);
-__strong_alias(__msgctl50, __stub_libc_err);
-__strong_alias(__ntp_gettime50, __stub_libc_err);
-__strong_alias(profil, __stub_libc_err);
-__strong_alias(__pselect50, __stub_libc_err);
-__strong_alias(recvmsg, __stub_libc_err);
-__strong_alias(____semctl50, __stub_libc_err);
-__strong_alias(__semctl50, __stub_libc_err);
-__strong_alias(__settimeofday50, __stub_libc_err);
-__strong_alias(__shmctl50, __stub_libc_err);
-__strong_alias(__sigaltstack14, __stub_libc_err);
-__strong_alias(____sigtimedwait50, __stub_libc_err);
-__strong_alias(__sigtramp_siginfo_2, __stub_libc_err);
-__strong_alias(timer_create, __stub_libc_err);
-__strong_alias(timer_delete, __stub_libc_err);
-__strong_alias(__timer_gettime50, __stub_libc_err);
-__strong_alias(__timer_settime50, __stub_libc_err);
-__strong_alias(wait6, __stub_libc_err);
-#else
-#error "__strong_alias is not defined"
-#endif
+void _exit(int ec);
 
 void
-__stub_libc_err(void)
+printerror(const char *fc)
 {
-	const char msg[] = "Your program has called a function that is not implemented yet in BSDLibC\n";
-
-	/* We try until the message was printed */
-	while (syscall(SYS_write, 2, msg, sizeof(msg) -1) != sizeof(msg) - 1);
-
-	/* First try to kill the current process with SIGSEGV */
-	syscall(SYS_kill, syscall(SYS_getpid), SIGSEGV);
-
-	/* If kill fails, we stop the entire process */
-	syscall(SYS_exit_group, 127);
-
-	/* Finally loop until the process finish */
-	for (;;) {
-		syscall(SYS_exit, 127);
-	}
+	fprintf(stderr, "%s: %s: is not implemented yet\n", getprogname(), fc);
+	_exit(127);
 }
+
+void recvmsg() { printerror("recvmsg"); }
+void profil() { printerror("profil"); }
+void wait6() { printerror("wait6"); }
+void timer_delete() { printerror("timer_delete"); }
+void timer_create() { printerror("timer_create"); }
+void __timer_gettime50() { printerror("__timer_gettime50"); }
+void __timer_settime50() { printerror("__timer_settime50"); }
+void __pselect50() { printerror("__pselect50"); }
+void __msgctl50() { printerror("__msgctl50"); }
+void __semctl50() { printerror("__semctl50"); }
+void ____semctl50() { printerror("____semctl50"); }
+void __shmctl50() { printerror("__shmctl50"); }
+void __adjtime50() { printerror("__adjtime50"); }
+void __mq_timedsend50() { printerror("__mq_timedsend50"); }
+void __mq_timedreceive50() { printerror("__mq_timedreceive50"); }
+void __lfs_segwait50() { printerror("__lfs_segwait50"); }
+void __aio_suspend50() { printerror("__aio_suspend50"); }
+void __settimeofday50() { printerror("__settimeofday50"); }
+void ____sigtimedwait50() { printerror("____sigtimedwait50"); }
+void __ntp_gettime50() { printerror("__ntp_gettime50"); }
+void __sigtramp_siginfo_2() { printerror("__sigtramp_siginfo_2"); }
