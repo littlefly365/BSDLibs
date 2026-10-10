@@ -28,8 +28,7 @@
 */
 
 #include <sys/cdefs.h>
-#include <sys/auxv.h>
-#include <unistd.h>
+#include <sys/stat.h>
 
 #ifdef __weak_alias
 __weak_alias(mkfifo, _mkfifo);
