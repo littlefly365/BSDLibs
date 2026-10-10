@@ -920,8 +920,14 @@ _setrlimit(int resource, const struct rlimit *rlim)
         return syscall(SYS_prlimit64, 0, resource, rlim, 0);
 }
 
+int
+chroot(const char *path)
+{
+	return syscall(SYS_chroot, path);
+}
+
 /*
- * syscalls: 161-163
+ * syscalls: 162-163
  * (not implemented)
 */
 
