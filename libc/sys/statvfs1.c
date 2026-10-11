@@ -1,3 +1,5 @@
+/*    $nlibc: statvfs1.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -27,16 +29,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: statvfs1.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
+
 #include <sys/syscall.h>
 #include <sys/statvfs.h>
-#include <sys/cdefs.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <mntent.h>
 #include <limits.h>
 #include <fcntl.h>
-#include "libc.h"
 
 struct statvfs_linux {
 	unsigned long f_bsize;
@@ -62,22 +67,29 @@ __statvfs190(const char *restrict path, struct statvfs *restrict buf, int flags 
 {
 	char new_path[PATH_MAX];
 	struct statvfs_linux vfs_linux = {0};
-	if (syscall(SYS_statfs, path, &vfs_linux) < 0)
-		return -1;
+
 	if (realpath(path, new_path) == NULL)
 		return -1;
+
+	if (syscall(SYS_statfs, new_path, &vfs_linux) < 0)
+		return -1;
+
 	return __vfs(new_path, buf, &vfs_linux);
 }
 
 int
 __fstatvfs190(int fd, struct statvfs *restrict buf, int flags __unused)
 {
-	char path[PATH_MAX];
+	char path[PATH_MAX], tmp[PATH_MAX];
 	struct statvfs_linux vfs_linux = {0};
+
+	snprintf(tmp, sizeof(tmp), "/proc/self/%d", fd);
+	if (realpath(tmp, path) == NULL)
+		return -1;
+
 	if (syscall(SYS_fstatfs, fd, &vfs_linux) < 0)
 		return -1;
-	if (procfdname(fd, path, sizeof(path) - 1) != 0)
-		return -1;
+
 	return __vfs(path, buf, &vfs_linux);
 
 }
@@ -124,7 +136,6 @@ __vfs(const char *path, struct statvfs *restrict buf, struct statvfs_linux *rest
 		while (getmntent_r(fp, &ent, linebuf, sizeof(linebuf)) != NULL)
 		{
 			size_t len = strlen(ent.mnt_dir);
-
 			if (strncmp(path, ent.mnt_dir, len))
 				continue;
 			if (len > 1 && path[len] != '\0' && path[len] != '/')

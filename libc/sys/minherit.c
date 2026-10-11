@@ -1,3 +1,5 @@
+/*    $nlibc: minherit.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -28,34 +30,38 @@
 */
 
 #include <sys/cdefs.h>
-#include <sys/mman.h>
-#include "libc.h"
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: minherit.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
 
-#ifdef __weak_alias
-__weak_alias(minherit, _minherit);
-#endif
+#include <sys/mman.h>
+#include <errno.h>
 
 #define MADV_DONTFORK   10
 #define MADV_DOFORK     11
 #define MADV_WIPEONFORK 18 
 
 int
-_minherit(void *addr, size_t len, int inherit)
+minherit(void *addr, size_t len, int inherit)
 {
 	int flag;
 
 	switch (inherit) {
-	case MAP_INHERIT_NONE:
-		flag = MADV_DONTFORK;
-		break;
 	case MAP_INHERIT_COPY:
 		flag = MADV_DOFORK;
 		break;
+	case MAP_INHERIT_NONE:
+		flag = MADV_DONTFORK;
+		break;
+	case MAP_INHERIT_SHARE:
+		errno = ENOTSUP;
+		return -1;
 	case MAP_INHERIT_ZERO:
 		flag = MADV_WIPEONFORK;
 		break;
 	default:
-		return seterrno(-ENOTSUP);
+		errno = EINVAL;
+		return -1;
 	}
 
 	return madvise(addr, len, flag);

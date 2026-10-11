@@ -1,3 +1,5 @@
+/*    $nlibc: lwp.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -27,9 +29,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: lwp.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
+
 #include <sys/syscall.h>
+#include <unistd.h>
 #include <lwp.h>
-#include "libc.h"
 
 #define ARCH_SET_FS		0x1002
 #define ARCH_GET_FS		0x1003

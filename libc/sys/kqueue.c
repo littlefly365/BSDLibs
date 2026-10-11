@@ -1,3 +1,5 @@
+/*    $nlibc: kqueue.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -28,9 +30,12 @@
 */
 
 #include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: kqueue.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
+
 #include <sys/event.h>
 #include <errno.h>
-#include "libc.h"
 
 /*
  * Is there a way to implement kevent/kqueue?
@@ -40,17 +45,20 @@ int
 __kevent100(int kq __unused, const struct kevent *changelist __unused, size_t nchanges __unused,
 	struct kevent *eventlist __unused, size_t nevents __unused, const struct timespec *timeout __unused)
 {
-	return seterrno(-ENOSYS);
+	errno = ENOSYS;
+	return -1;
 }
 
 int
 kqueue1(int flags __unused)
 {
-	return seterrno(-ENOSYS);
+	errno = ENOSYS;
+	return -1;
 }
 
 int
 kqueue(void)
 {
-	return kqueue1(0);
+	errno = ENOSYS;
+	return -1;
 }

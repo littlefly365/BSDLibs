@@ -1,3 +1,5 @@
+/*    $nlibc: mkfifo.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -28,14 +30,14 @@
 */
 
 #include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: mkfifo.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
+
 #include <sys/stat.h>
 
-#ifdef __weak_alias
-__weak_alias(mkfifo, _mkfifo);
-#endif
-
 int
-_mkfifo(const char *path, mode_t mode)
+mkfifo(const char *path, mode_t mode)
 {
 	return mknod(path, mode | 0010000, 0);
 }

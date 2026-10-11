@@ -1,3 +1,5 @@
+/*    $nlibc: setxid.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -27,60 +29,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <sys/syscall.h>
 #include <sys/cdefs.h>
-#include <signal.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: setxid.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
+
+#include <sys/syscall.h>
 #include <unistd.h>
 
-#ifdef __weak_alias
-__weak_alias(sigaction, __sigaction_siginfo)
-#endif
-
-#ifdef __strong_alias
-__strong_alias(__sigaction_sigtramp, __sigaction_siginfo);
-#endif
-
-extern void __attribute__((noreturn)) linux_sigreturn(void);
-
-struct linux_sigaction {
-	void (*handler)(int);
-	unsigned long flags;
-	void (*restorer)(void);
-	unsigned mask[2];
-};
+int
+seteuid(uid_t uid)
+{
+	return syscall(SYS_setresuid, -1, uid, -1);
+}
 
 int
-__sigaction_siginfo(int nsig, const struct sigaction *restrict sa, struct sigaction *restrict old)
+setegid(gid_t gid)
 {
-	int flags;
-	struct linux_sigaction sai, oldi;
-
-	if (sa != NULL)
-	{
-		sai.handler = sa->sa_handler;
-		flags = sa->sa_flags;
-
-		flags |= 0x04000000;
-
-		sai.flags = flags;
-		sai.restorer = linux_sigreturn;
-
-		sai.mask[0] = sa->sa_mask.__bits[0];
-		sai.mask[1] = sa->sa_mask.__bits[1];
-	}
-
-
-	int ret = syscall(SYS_rt_sigaction, nsig, sa != NULL ? &sai : NULL, old != NULL ? &oldi : NULL, 8);
-	if (ret == -1)
-		return -1;
-
-	if (old)
-	{
-		old->sa_handler = oldi.handler;
-		old->sa_flags = oldi.flags & ~0x04000000;
-		old->sa_mask.__bits[0] = oldi.mask[0];
-		old->sa_mask.__bits[1] = oldi.mask[1];
-	}
-
-	return 0;
+	return syscall(SYS_setresgid, -1, gid, -1);
 }

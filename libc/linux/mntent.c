@@ -8,7 +8,6 @@
 #include <mntent.h>
 #include <errno.h>
 #include <limits.h>
-#include "libc.h"
 
 static char *internal_buf;
 static size_t internal_bufsize;
@@ -84,7 +83,7 @@ struct mntent
 		if (feof(f) || ferror(f)) return 0;
 		if (!strchr(linebuf, '\n')) {
 			fscanf(f, "%*[^\n]%*[\n]");
-			seterrno(-ERANGE);
+			errno = ERANGE;
 			return 0;
 		}
 

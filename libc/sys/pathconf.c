@@ -1,3 +1,5 @@
+/*    $nlibc: pathconf.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -28,42 +30,83 @@
 */
 
 #include <sys/cdefs.h>
-#include <sys/statvfs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: pathconf.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
+
 #include <sys/syslimits.h>
+#include <sys/statvfs.h>
 #include <string.h>
 #include <unistd.h>
-#include "libc.h"
-
-#ifdef __weak_alias
-__weak_alias(pathconf, _pathconf);
-#endif
+#include <errno.h>
 
 long
-_pathconf(const char *path, int name)
+#ifdef _FPATHCONF
+fpathconf(int fd, int name)
+#else
+pathconf(const char *path, int name)
+#endif
 {
+	int ret;
 	struct statvfs st;
-
-	/* NetBSD pathconf fails if the entire path is larger than PATH_MAX */
-	if (strlen(path) > PATH_MAX)
-		return seterrno(-ENAMETOOLONG);
-
-	if (access(path, F_OK) != 0)
-		return seterrno(-ENOENT);
-
-	switch (name)
-	{
-	case _PC_NAME_MAX:
-		if (statvfs(path, &st) < 0)
-			return NAME_MAX;
-		return st.f_namemax;
-	default:
-		/*
-		 * I know that fd 0 is stdin, but
-		 * fpathconf only use fd to get
-		 * _PC_NAME_MAX.
-		*/
-		return fpathconf(0, name);
+#ifdef _FPATHCONF
+	if ((ret = fstatvfs(fd, &st)) != 0 && errno == EBADFD)
+#else
+	if (path == NULL) {
+		errno = EINVAL;
+		return -1;
 	}
 
+	if (strlen(path) > PATH_MAX) {
+		errno = ENAMETOOLONG;
+		return -1;
+	}
+
+	if ((ret = statvfs(path, &st)) != 0 && errno == ENOENT)
+#endif
+		return -1;
+
+	switch (name) {
+	case _PC_LINK_MAX:
+		return LINK_MAX;
+	case _PC_MAX_CANON:
+		return MAX_CANON;
+	case _PC_MAX_INPUT:
+		return MAX_INPUT;
+	case _PC_NAME_MAX:
+		if (ret != 0)
+			return NAME_MAX;
+		return st.f_namemax;
+	case _PC_PATH_MAX:
+		return PATH_MAX;
+	case _PC_PIPE_BUF:
+		return PIPE_BUF;
+	case _PC_CHOWN_RESTRICTED:
+		return _POSIX_CHOWN_RESTRICTED;
+	case _PC_NO_TRUNC:
+		return _POSIX_NO_TRUNC;
+	case _PC_VDISABLE:
+		return _POSIX_VDISABLE;
+	case _PC_SYNC_IO:
+		return 1;
+	case _PC_FILESIZEBITS:
+		return 64; 	/* 64? */
+	case _PC_SYMLINK_MAX:
+		return -1;	/* Glibc says there's not any system with this limit */
+	case _PC_2_SYMLINKS:
+		return 1;
+	case _PC_ACL_EXTENDED:
+		return 0;	/* fd do not support acl */
+	case _PC_MIN_HOLE_SIZE:
+		return 4096;
+	case _PC_ACL_PATH_MAX:
+		return PATH_MAX; /* is it the same? */
+	case _PC_ACL_NFS4:
+		return 0;	/* fd do not support NFSv4 acl */
+	default:
+		break;
+	}
+
+	errno = EINVAL;
 	return -1;
 }

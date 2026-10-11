@@ -1,3 +1,5 @@
+/*    $nlibc: syscalls.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -27,6 +29,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: syscalls.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
+
 #include <machine/vmparam.h>
 #include <sys/syscall.h>
 #include <sys/utsname.h>
@@ -44,7 +51,6 @@
 #include <errno.h>
 #include <time.h>
 #include "reentrant.h"
-#include "libc.h"
 
 #ifdef __weak_alias
 __weak_alias(read, _read);
@@ -236,8 +242,10 @@ _brk(void *addr)
 	if ((char*)addr < __minbrk)
 		addr = __minbrk;
 
-	if ((char*)syscall(SYS_brk, addr) < (char*)addr)
-		return seterrno(-ENOMEM);
+	if ((char*)syscall(SYS_brk, addr) < (char*)addr) {
+		errno = ENOMEM;
+		return -1;
+	}
 
 	return 0;
 }
@@ -250,8 +258,10 @@ _brk(void *addr)
 int
 __sigprocmask14(int how, const sigset_t *set, sigset_t *oset)
 {
-	if (set && how - SIG_BLOCK > 2)
-		return seterrno(-EINVAL);
+	if (set && how - SIG_BLOCK > 2) {
+		errno = EINVAL;
+		return -1;
+	}
 
 	if (syscall(SYS_rt_sigprocmask, how, set, oset, 8) != 0)
 		return -1;
@@ -319,8 +329,11 @@ _sys_sched_yield(void)
 void
 *_mremap(void *oldp, size_t oldsize, void *newp, size_t newsize, int flags)
 {
-	if (newsize >= PTRDIFF_MAX)
-		return (void*)seterrno(-ENOMEM);
+	if (newsize >= PTRDIFF_MAX) {
+		errno = ENOMEM;
+		return (void*)-1;
+	}
+
 	return (void*)syscall(SYS_mremap, oldp, oldsize, newsize, flags, newp);
 }
 

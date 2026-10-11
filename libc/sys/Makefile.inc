@@ -2,12 +2,12 @@
 
 SRCS+=	eventfd_read.c eventfd_write.c fh.c fpathconf.c futimens.c getdents.c \
 	getvfsstat.c ioctl.c issetugid.c kqueue.c login.c mmap.c posix_madvise.c \
-	pathconf.c lwp.c minherit.c sbrk.c setexid.c __sigaction_siginfo.c \
+	pathconf.c lwp.c minherit.c sbrk.c setxid.c sigaction.c \
 	stat.c statvfs1.c statvfs.c syscall.c syscalls.c __sysctl.c utimes.c \
 	utrace.c uuidgen.c vadvise.c mkfifo.c
 
 .include "${ARCHDIR}/sys/Makefile.inc"
-
+.if 0
 MAN+=	accept.2 access.2 acct.2 adjtime.2 bind.2 brk.2 chdir.2 \
 	chflags.2 chmod.2 chown.2 chroot.2 clock_getcpuclockid2.2 \
 	clock_settime.2 clone.2 close.2 \
@@ -159,3 +159,4 @@ MLINKS+=pipe.2 pipe2.2
 MLINKS+=accept.2 paccept.2 accept.2 accept4.2
 MLINKS+=nanosleep.2 clock_nanosleep.2
 MLINKS+=clock_getcpuclockid2.2 clock_getcpuclockid.2
+.endif

@@ -1,3 +1,5 @@
+/*    $nlibc: __sysctl.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -27,27 +29,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: __sysctl.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
+
 /*
  * It's not my plan to implement all sysctl under the Linux Kernel,
  * my plan is to implement the most case of use in the netbsd userland
  * and the third party software.
 */
 
-#define _OPENBSD_SOURCE /* strtonum */
-#define _NETBSD_SOURCE
 #include <sys/syscall.h>
 #include <sys/utsname.h>
 #include <sys/sysctl.h>
 #include <sys/random.h>
 #include <sys/param.h> /* MACHINE and MACHINE_ARCH */
 #include <sys/types.h>
+#include <inttypes.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <paths.h>
 #include <fcntl.h>
 #include <errno.h>
-#include "libc.h"
 
 #include <machine/vmparam.h>
 
@@ -67,19 +71,18 @@ static int get_from_file(const char *path, char *buf, size_t len);
 static int copy(const char *src, char *dst, size_t srclen, size_t *dstlen);
 
 int
-__sysctl(const int *mib, u_int miblen, void *oldp, size_t *oldlenp, const void *newp, size_t newlenp)
+__sysctl(const int *name, u_int miblen, void *oldp, size_t *oldlenp, const void *newp, size_t newlenp)
 {
-	if ((mib[0] != CTL_KERN && mib[0] != CTL_HW) || (miblen == 0 || __arraycount(mib) != 2)) /* We only support 2 mibs */
-		return seterrno(-EINVAL);
+	if (miblen == 0 || miblen > CTL_MAXNAME) {
+		errno = EINVAL;
+		return -1;
+	}
 
 	/* CTL_KERN set and get information */
-	if (mib[0] == CTL_KERN)
-	{
+	if (name[0] == CTL_KERN) {
 			/* Set information */
-			if (newp != NULL && newlenp > 0) /* Do we need to check newlenp? */
-			{
-				switch (mib[1])
-				{
+			if (newp != NULL && newlenp > 0) {
+				switch (name[1]) {
 				case KERN_HOSTNAME:
 					return syscall(SYS_sethostname, newp, newlenp);
 				case KERN_DOMAINNAME:
@@ -93,23 +96,21 @@ __sysctl(const int *mib, u_int miblen, void *oldp, size_t *oldlenp, const void *
 					close(fd);
 					return 0;
 				default:
-					return seterrno(-EPERM); /* Cannot modify information like ostype, so EPERM */
+					errno = EPERM;
+					return -1; /* Cannot modify information like ostype, so EPERM */
 				}
 			}
 
-			if (mib[1] == KERN_OSRELEASE || mib[1] == KERN_VERSION || \
-				mib[1] == KERN_HOSTNAME || mib[1] == KERN_DOMAINNAME)
-			{
-				if (uts.release[0] == '\0')
-				{
+			if (name[1] == KERN_OSRELEASE || name[1] == KERN_VERSION || \
+				name[1] == KERN_HOSTNAME || name[1] == KERN_DOMAINNAME) {
+				if (uts.release[0] == '\0') {
 					if (syscall(SYS_uname, &uts) != 0)
 						return -1;
 				}
 			}
 
 			/* Get information */
-			switch (mib[1])
-			{
+			switch (name[1]) {
 			case KERN_OSTYPE:
 				return copy("Linux", oldp, 5, oldlenp);
 			case KERN_OSRELEASE:
@@ -120,7 +121,8 @@ __sysctl(const int *mib, u_int miblen, void *oldp, size_t *oldlenp, const void *
 			case KERN_VERSION:
 				return copy(uts.version, oldp, strlen(uts.version), oldlenp);
 			case KERN_MAXVNODES:
-				return seterrno(-ENOTSUP);
+				errno = ENOTSUP;
+				return -1;
 			case KERN_MAXPROC:
 					if ((*(int*)oldp = get_int_from_file("/proc/sys/kernel/pid_max")) <= 0)
 					return -1;
@@ -150,7 +152,8 @@ __sysctl(const int *mib, u_int miblen, void *oldp, size_t *oldlenp, const void *
 			case KERN_PROC:
 			case KERN_FILE:
 			case KERN_PROF:
-				return seterrno(-ENOTSUP);
+				errno = ENOTSUP;
+				return -1;
 			case KERN_POSIX1:
 				*(int*)oldp = _POSIX_VERSION;
 				break;
@@ -160,7 +163,8 @@ __sysctl(const int *mib, u_int miblen, void *oldp, size_t *oldlenp, const void *
 			case KERN_JOB_CONTROL:
 			case KERN_SAVED_IDS:
 			case KERN_OBOOTTIME:
-				return seterrno(-ENOTSUP);
+				errno = ENOTSUP;
+				return -1;
 			case KERN_DOMAINNAME:
 				return copy(uts.domainname, oldp, strlen(uts.domainname), oldlenp);
 			case KERN_MAXPARTITIONS:
@@ -175,7 +179,8 @@ __sysctl(const int *mib, u_int miblen, void *oldp, size_t *oldlenp, const void *
 			case KERN_OLDSYSVMSG:
 			case KERN_OLDSYSVSHM:
 			case KERN_OLDSHORTCORENAME:
-				return seterrno(-ENOTSUP);
+				errno = ENOTSUP;
+				return -1;
 			case KERN_SYNCHRONIZED_IO:
 				*(int*)oldp = 1;
 				break;
@@ -185,7 +190,8 @@ __sysctl(const int *mib, u_int miblen, void *oldp, size_t *oldlenp, const void *
 			case KERN_MEMLOCK:
 			case KERN_MEMLOCK_RANGE:
 			case KERN_MEMORY_PROTECTION:
-				return seterrno(-ENOTSUP);
+				errno = ENOTSUP;
+				return -1;
 			case KERN_LOGIN_NAME_MAX:
 				*(int*)oldp = LOGIN_NAME_MAX;
 				break;
@@ -225,7 +231,8 @@ __sysctl(const int *mib, u_int miblen, void *oldp, size_t *oldlenp, const void *
 			case KERN_VERIEXEC:
 			case KERN_CP_ID:
 			case KERN_HARDCLOCK_TICKS:
-				return seterrno(-ENOTSUP);
+				errno = ENOTSUP;
+				return -1;
 			case KERN_ARND:
 				if (getrandom(oldp, *oldlenp, 0) < 0)
 					return -1;
@@ -235,22 +242,22 @@ __sysctl(const int *mib, u_int miblen, void *oldp, size_t *oldlenp, const void *
 			case KERN_EVCNT:
 			case KERN_SOFIXEDBUF:
 			case KERN_ENTROPY:
-				return seterrno(-ENOTSUP);
+				errno = ENOTSUP;
+				return -1;
 			default:
-				return seterrno(-EINVAL);
+				errno = EINVAL;
+				return -1;
 			}
 
 	}
 
-	if (mib[0] == CTL_HW)
-	{
-		if (newp != NULL && newlenp > 0)
-		{
-			return seterrno(-EPERM);
+	if (name[0] == CTL_HW) {
+		if (newp != NULL && newlenp > 0) {
+			errno = EPERM;
+			return -1;
 		}
 
-		switch (mib[1])
-		{
+		switch (name[1]) {
 		case HW_MACHINE:
 			return copy(MACHINE, oldp, strlen(MACHINE), oldlenp);
 		case HW_MODEL:
@@ -264,13 +271,15 @@ __sysctl(const int *mib, u_int miblen, void *oldp, size_t *oldlenp, const void *
 			break;
 		case HW_PHYSMEM:
 		case HW_USERMEM:
-			return seterrno(-ENOTSUP);
+			errno = ENOTSUP;
+			return -1;
 		case HW_PAGESIZE:
 			*(int*)oldp = PAGE_SIZE;
 			break;
 		case HW_DISKNAMES:
 		case HW_IOSTATS:
-			return seterrno(-ENOTSUP);
+			errno = ENOTSUP;
+			return -1;
 		case HW_MACHINE_ARCH:
 			return copy(MACHINE_ARCH, oldp, strlen(MACHINE_ARCH), oldlenp);
 		case HW_ALIGNBYTES:
@@ -280,13 +289,15 @@ __sysctl(const int *mib, u_int miblen, void *oldp, size_t *oldlenp, const void *
 		case HW_PHYSMEM64:
 		case HW_USERMEM64:
 		case HW_IOSTATNAMES:
-			return seterrno(-ENOTSUP);
+			errno = ENOTSUP;
+			return -1;
 		case HW_NCPUONLINE:
 			if ((*(int*)oldp = get_int_from_file("/sys/devices/system/cpu/online")) <= 0)
 				return -1;
 			break;
 		default:
-			return seterrno(-EINVAL);
+			errno = EINVAL;
+			return -1;
 		}
 	}
 
@@ -305,7 +316,8 @@ copy(const char *src, char *dst, size_t srclen, size_t *dstlen)
 	if (*dstlen < srclen)
 	{
 		*dstlen = srclen;
-		return seterrno(-ENOMEM);
+		errno = ENOMEM;
+		return -1;
 	}
 
 	strlcpy(dst, src, *dstlen);
@@ -315,6 +327,7 @@ copy(const char *src, char *dst, size_t srclen, size_t *dstlen)
 int
 get_int_from_file(const char *path)
 {
+	int e;
 	char buf[128];
 	char *str;
 	const char *errstr = NULL;
@@ -336,12 +349,12 @@ get_int_from_file(const char *path)
 		*str = '\0';
 		char *endp = str + 1;
 
-		int n1 = strtonum(buf, 0, INT32_MAX, &errstr);
-		if (errstr != NULL)
+		int n1 = strtoi(buf, NULL, 0, 0, INT32_MAX, &e);
+		if (e)
 			return -1;
 
-		int n2 = strtonum(endp, 0, INT32_MAX, &errstr);
-		if (errstr != NULL)
+		int n2 = strtoi(endp, NULL, 0, 0, INT32_MAX, &e);
+		if (e)
 			return -1;
 
 		return n2 - n1 + 1;
@@ -353,8 +366,8 @@ get_int_from_file(const char *path)
 		return 1; /* fallback */
 	}
 
-	int n = strtonum(buf, 0, INT32_MAX, &errstr);
-	if (errstr != NULL)
+	int n = strtoi(buf, NULL, 0, 0, INT32_MAX, &e);
+	if (e)
 		return -1;
 
 	return n;

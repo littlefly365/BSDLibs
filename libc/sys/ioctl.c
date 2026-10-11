@@ -1,3 +1,5 @@
+/*    $nlibc: ioctl.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -27,23 +29,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: ioctl.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
+
 #include <sys/syscall.h>
 #include <sys/ioctl.h>
-#include <sys/cdefs.h>
-#include <string.h>
-#include <stdarg.h>
 #include <unistd.h>
-#include <stdio.h>
-#include "libc.h"
-
-#ifdef __weak_alias
-__weak_alias(ioctl, _ioctl);
-#endif
-
-static int compat_ioctl(int fd, unsigned long request, void *arg);
+#include <stdarg.h>
 
 int
-_ioctl(int fd, unsigned long request, ...)
+ioctl(int fd, unsigned long request, ...)
 {
 	void *arg;
 	va_list ap;
@@ -51,30 +48,5 @@ _ioctl(int fd, unsigned long request, ...)
 	arg = va_arg(ap, void *);
 	va_end(ap);
 
-	return compat_ioctl(fd, request, arg);
-}
-
-static const char pts[] = "/dev/pts/";
-
-static int
-compat_ioctl(int fd, unsigned long request, void *arg)
-{
-#if 0
-	if (request == TIOCPTSNAME)
-	{
-		int ret;
-		unsigned int pty;
-		struct ptmget *ptm = (struct ptmget*)arg;
-
-		if (syscall(SYS_ioctl, fd, TIOCGPTN, &pty) < 0)
-			return -1;
-
-		ret = snprintf(ptm->sn, sizeof(ptm->sn), "%s%u", pts, pty);
-		if (ret < 0 || ret >= PATH_MAX)
-			return -1;
-
-		return 0;
-	}
-#endif
 	return syscall(SYS_ioctl, fd, request, arg);
 }

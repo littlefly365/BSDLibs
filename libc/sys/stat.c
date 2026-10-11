@@ -1,3 +1,5 @@
+/*    $nlibc: stat.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -27,15 +29,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <sys/syscall.h>
 #include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: stat.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
+
+#include <sys/syscall.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <time.h>
-#include "libc.h"
 
-#define STATX_BTIME	0x800U
 struct statx_timespec {
 	int64_t tv_sec;
 	uint32_t tv_nsec;
@@ -71,8 +74,9 @@ fstatat(int fd,  const char *path, struct stat *restrict stat, int flag)
 {
 	struct statx stx = {0};
 
-	syscall(SYS_statx, fd, path, flag, 0xfff, &stx);
-	
+	if (syscall(SYS_statx, fd, path, flag, 0xfff, &stx) != 0)
+		return -1;
+
 	stat->st_dev = makedev(stx.stx_dev_major, stx.stx_dev_minor);
 	stat->st_ino = stx.stx_ino;
 	stat->st_mode = stx.stx_mode;
@@ -93,7 +97,7 @@ fstatat(int fd,  const char *path, struct stat *restrict stat, int flag)
 	stat->st_ctim.tv_sec = stx.stx_ctime.tv_sec;
 	stat->st_ctim.tv_nsec = stx.stx_ctime.tv_nsec;
 
-	if (stx.stx_mask & STATX_BTIME) {
+	if (stx.stx_mask & 0x800U) {
 		stat->st_birthtim.tv_sec = stx.stx_btime.tv_sec;
 		stat->st_birthtim.tv_nsec = stx.stx_btime.tv_nsec;
 	} else {

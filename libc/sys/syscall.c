@@ -1,3 +1,5 @@
+/*    $nlibc: syscall.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -21,30 +23,31 @@
  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS longERRUPTION) HOWEVER
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <sys/syscall.h>
 #include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: syscall.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
+
+#include <sys/syscall.h>
 #include <stdarg.h>
-#include "libc.h"
+#include <errno.h>
+#include "namespace.h"
 
 #ifdef __weak_alias
-__weak_alias(_syscall, syscall);
+__weak_alias(syscall, _syscall);
+__weak_alias(__syscall, syscall);
 #endif
-
-#ifdef __strong_alias
-__strong_alias(__syscall, syscall);
-#endif
-
-extern long __sys_syscall(long n, long a1, long a2, long a3, long a4, long a5, long a6);
 
 long
 syscall(long n, ...)
 {
+	int r;
 	va_list ap;
 
 	va_start(ap, n);
@@ -56,8 +59,27 @@ syscall(long n, ...)
 	long a6 = va_arg(ap, long);
 	va_end(ap);
 
-	if (n < 0 || n >= SYS_MAXSYSCALL)
-		return seterrno(-ENOSYS);
+	if (n < 0 || n >= SYS_MAXSYSCALL) {
+		errno = ENOSYS;
+		return -1;
+	}
 
-	return seterrno(__sys_syscall(n, a1, a2, a3, a4, a5, a6));
+#if defined(__x86_64__) || defined(__amd64__)
+	register long r10 __asm__("r10") = a4;
+	register long r8 __asm__("r8") = a5;
+	register long r9 __asm__("r9") = a6;
+
+	__asm__ __volatile__ (	"syscall" : "=a" (r) : "a"(n), "D"(a1),
+				"S"(a2), "d"(a3), "r"(r10), "r"(r8), 
+				"r"(r9) : "rcx", "r11", "memory");
+#else
+#error "nlibc is only for x86_64"
+#endif
+
+	if (r <= -1 || r >= 4095) {
+		errno = -r;
+		return -1;
+	}
+
+	return r;
 }

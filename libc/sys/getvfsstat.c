@@ -1,3 +1,5 @@
+/*    $nlibc: getvfsstat.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -27,23 +29,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <sys/statvfs.h>
 #include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: getvfsstat.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
+
+#include <sys/statvfs.h>
 #include <unistd.h>
 #include <string.h>
 #include <mntent.h>
 #include <stdio.h>
-
-static const char *skip_fsnames[] = { 
-	"securityfs", "devpts", "cgroup2", "none",
-	"bpf", "tracefs", "hugetlbfs", "fusectl",
-	"mqueue", "configfs", "portal", "binfmt_misc",
-	NULL
-};
-
-static const char *skip_mounts[] = { "/proc/", "/sys/fs", "/dev/shm", "/var", "/run/", NULL };
-
-static int match(const char **fsnames, const char **mounts, const char *fs, const char *mount);
 
 int
 __getvfsstat90(struct statvfs *buf, size_t bufsize, int flags __unused)
@@ -60,12 +55,9 @@ __getvfsstat90(struct statvfs *buf, size_t bufsize, int flags __unused)
 
 	while (getmntent_r(f, &ent, linebuf, sizeof(linebuf)) != NULL)
 	{
-		if (match(skip_fsnames, skip_mounts, ent.mnt_type, ent.mnt_dir))
-				continue;
-
 		if (buf != NULL && i < nbuf)
 		{
-			if (statvfs(ent.mnt_dir, &vfs) == -1)
+			if (statvfs(ent.mnt_dir, &vfs) != 0)
 				return -1;
 
 			buf[i].f_flag = vfs.f_flag;
@@ -111,23 +103,4 @@ __getvfsstat90(struct statvfs *buf, size_t bufsize, int flags __unused)
 
 	endmntent(f);
 	return size;
-}
-
-static int
-match(const char **fsnames, const char **mounts, const char *fs, const char *mount)
-{
-	for (int i = 0; fsnames[i] != NULL; i++)
-	{
-		if (!strcmp(fsnames[i], fs))
-			return 1;
-	}
-
-	for (int i = 0; mounts[i] != NULL; i++)
-	{
-		int len = strlen(mounts[i]);
-		if (!strncmp(mounts[i], mount, len))
-			return 1;
-	}
-
-	return 0;
 }

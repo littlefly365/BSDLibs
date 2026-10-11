@@ -1,3 +1,5 @@
+/*    $nlibc: sbrk.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -27,17 +29,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <sys/syscall.h>
 #include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: sbrk.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
+
+#include <sys/syscall.h>
 #include <unistd.h>
-#include "libc.h"
 
 #ifdef __weak_alias
 __weak_alias(sbrk, _sbrk);
 #endif
 
-void
-*_sbrk(intptr_t increment)
+void *
+_sbrk(intptr_t increment)
 {
 	void *oldbrk = (void*)syscall(SYS_brk, 0);
 

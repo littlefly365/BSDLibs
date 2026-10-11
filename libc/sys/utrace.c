@@ -1,3 +1,5 @@
+/*    $nlibc: utrace.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+
 /*
  * Copyright (c) 2026, littlefly365
  * 
@@ -27,11 +29,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <sys/ktrace.h>
 #include <sys/cdefs.h>
-#include <unistd.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$nlibc: utrace.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+#endif /* LIBC_SCCS and not lint */
+
+#include <sys/ktrace.h>
 #include <errno.h>
-#include "libc.h"
 
 int
 utrace(const char *label __unused, void *addr __unused, size_t len __unused)
@@ -42,7 +46,11 @@ utrace(const char *label __unused, void *addr __unused, size_t len __unused)
 	 * so it's not a big deal do the same.
 	*/
 
-	if (len > KTR_USER_MAXLEN)
-		return seterrno(-EINVAL);
-	return seterrno(-ENOSYS);
+	if (len > KTR_USER_MAXLEN) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	errno = ENOSYS;
+	return -1;
 }

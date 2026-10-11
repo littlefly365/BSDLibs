@@ -31,4 +31,3 @@ void __aio_suspend50() { printerror("__aio_suspend50"); }
 void __settimeofday50() { printerror("__settimeofday50"); }
 void ____sigtimedwait50() { printerror("____sigtimedwait50"); }
 void __ntp_gettime50() { printerror("__ntp_gettime50"); }
-void __sigtramp_siginfo_2() { printerror("__sigtramp_siginfo_2"); }
