@@ -1,5 +1,5 @@
-# BSDLibC
-BSDLibC is an experimental port of the NetBSD libc (and maybe other basic libs) for Linux.
+# nlibc
+nlibc is an experimental port of the NetBSD libc (and other basic libs) for Linux.
 
 # Whats available?
 - support for x86_64
