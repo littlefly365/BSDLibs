@@ -4,6 +4,7 @@ bitstring.h
 bm.h
 cdbr.h
 cdbw.h
+complex.h
 ctype.h
 db.h
 dirent.h
@@ -33,6 +34,7 @@ limits.h
 link_elf.h
 link.h
 locale.h
+login_cap.h
 lwp.h
 malloc.h
 math.h
@@ -41,6 +43,7 @@ md4.h
 md5.h
 memory.h
 mntent.h
+mntopts.h
 monetary.h
 mpool.h
 mqueue.h
@@ -497,6 +500,7 @@ sys/ansi.h
 sys/atomic.h
 sys/auxv.h
 sys/bitops.h
+sys/bootblock.h
 sys/bswap.h
 sys/callout.h
 sys/cdbr.h
@@ -508,9 +512,13 @@ sys/common_int_fmtio.h
 sys/common_int_limits.h
 sys/common_int_mwgwtypes.h
 sys/common_int_types.h
+sys/cpu.h
 sys/ctype_bits.h
 sys/ctype_inline.h
 sys/dirent.h
+sys/disk.h
+sys/disklabel.h
+sys/dkbad.h
 sys/dkio.h
 sys/elfdefinitions.h
 sys/endian.h
@@ -534,6 +542,7 @@ sys/ieee754.h
 sys/inttypes.h
 sys/ioccom.h
 sys/ioctl.h
+sys/iostat.h
 sys/ipc.h
 sys/ksyms.h
 sys/ktrace.h
@@ -592,6 +601,7 @@ sys/timex.h
 sys/tls.h
 sys/ttycom.h
 sys/ttydefaults.h
+sys/ttydev.h
 sys/types.h
 sys/ucontext.h
 sys/ucred.h
