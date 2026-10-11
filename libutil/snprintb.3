@@ -1,0 +1,488 @@
+.\"     $NetBSD: snprintb.3,v 1.39.4.1 2026/04/02 19:09:51 martin Exp $
+.\"
+.\" Copyright (c) 1998, 2024 The NetBSD Foundation, Inc.
+.\" All rights reserved.
+.\"
+.\" This code is derived from software contributed to The NetBSD Foundation
+.\" by Jeremy Cooper.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
+.\" ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+.\" TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+.\" PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
+.\" BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+.\" CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+.\" SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+.\" INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+.\" CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+.\" ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+.\" POSSIBILITY OF SUCH DAMAGE.
+.\"
+.Dd March 14, 2026
+.Dt SNPRINTB 3
+.Os
+.Sh NAME
+.Nm snprintb ,
+.Nm snprintb_m
+.Nd bitmask output conversion
+.Sh LIBRARY
+.Lb libutil
+.Sh SYNOPSIS
+.In util.h
+.Ft int
+.Fn "snprintb" "char *buf" "size_t bufsize" "const char *fmt" "uint64_t val"
+.Ft int
+.Fn "snprintb_m" "char *buf" "size_t bufsize" "const char *fmt" "uint64_t val" \
+"size_t max"
+.Sh DESCRIPTION
+The
+.Fn snprintb
+function formats a bitmask into a mnemonic form suitable for printing.
+.Pp
+It formats the integer
+.Fa val
+into the buffer
+.Fa buf ,
+of size
+.Fa bufsize ,
+interpreting the bits within that integer as flags or groups of bits.
+The buffer is always
+.Tn NUL Ns -terminated.
+If the buffer
+.Fa buf
+is too small to hold the formatted output,
+.Fn snprintb
+will fill as much as it can, and return the number of bytes
+that it would have written if the buffer were long enough excluding the
+terminating
+.Tn NUL .
+If
+.Fa bufsize
+is zero, nothing is written and
+.Fa buf
+may be a null pointer.
+.Pp
+The
+.Fn snprintb_m
+function accepts an additional
+.Fa max
+argument.
+If this argument is zero, the
+.Fn snprintb_m
+function behaves exactly like the
+.Fn snprintb
+function.
+If the
+.Fa max
+argument has a non-zero value, it represents the maximum length of a
+formatted string.
+If the formatted string would require more than
+.Fa max
+characters, the
+.Fn snprintb_m
+function returns multiple formatted strings in the output buffer
+.Fa buf .
+Each string is
+.Tn NUL Ns -terminated ,
+and the last string is followed by an
+additional
+.Tn NUL
+character
+.Pq or, if you prefer, a zero-length string .
+.Pp
+The decoding directive in
+.Fa fmt
+describes how the bitfield is to be interpreted and displayed.
+It follows two possible formats, referred to as
+.Dq old
+and
+.Dq new .
+The
+.Dq old
+format is limited to describing single bits in a 32-bit value,
+the bit positions are 1-based.
+The
+.Dq new
+format supports multi-bit fields and 64-bit values,
+the bit positions are 0-based.
+.Pp
+If the first character of
+.Fa fmt
+is
+.Pq in C escape-character format
+.Ql \e177
+or
+.Ql \ex7f ,
+the remainder of the
+.Fa fmt
+argument follows the
+.Dq new
+format.
+.Pp
+The next character
+.Po the first for the
+.Dq old
+format
+.Pc
+specifies the numeral base in which to print the numbers in the output.
+The possible values are
+.Ql \e010
+or
+.Ql \ex08
+for octal,
+.Ql \e012
+or
+.Ql \ex0a
+for decimal, and
+.Ql \e020
+or
+.Ql \ex10
+for hexadecimal.
+.Pp
+The remaining characters in the
+.Fa fmt
+argument represent the formatting conversions,
+according to the
+.Dq old
+or
+.Dq new
+format.
+.
+.Ss Old Format
+.Pp
+In the
+.Dq old
+format, each conversion specifies a bit position
+and a description that is printed if the corresponding bit is set.
+.Pp
+The bit position is a 1-based single-byte binary value,
+ranging from
+.Ql \e001
+or
+.Ql \ex01
+(1) for the least significant bit up to
+.Ql \e040
+or
+.Ql \ex20
+(32) for the most significant bit.
+.Pp
+The description is delimited by the next character whose value is 32 or less
+.Po see
+.Xr ascii 7
+.Pc ,
+or by the end of the format string itself.
+.
+.Ss New Format
+.Pp
+In the
+.Dq new
+format,
+each conversion begins with a conversion type,
+followed by type-specific parameters, each encoded as a single byte,
+followed by a
+.Tn NUL Ns -terminated description.
+The bit positions are 0-based,
+ranging from
+.Ql \e000
+or
+.Ql \ex00
+(0) for the least significant bit to
+.Ql \e077
+or
+.Ql \ex3f
+(63) for the most significant bit.
+.
+.Bl -tag -width Cm
+.
+.It Cm b Ar bit Ar descr
+Prints the description from
+.Ar descr
+if the bit at the position
+.Ar bit
+is set.
+.
+.It Cm f Ar lsb Ar width Ar descr
+Prints the description from
+.Ar descr ,
+a delimiting
+.Sq \&=
+and the numerical value of the multi-bit field
+whose least significant bit is at
+.Ar lsb
+and that spans
+.Ar width
+bits.
+To print individual values of the field, see the
+.Sq Cm \&= ,
+.Sq Cm \&:
+and
+.Sq Cm \&*
+conversions below.
+.
+.It Cm \&= Ar cmp Ar descr
+Compares the field value from the previous
+.Sq Cm f
+.Pq or, in rare cases, Sq Cm F
+conversion to the single-byte value
+.Ar cmp ,
+ranging from
+.Ql \e000
+or
+.Ql \ex00
+(0) to
+.Ql \e377
+or
+.Ql \exff
+(255).
+If they are equal, prints
+.Ql \&=
+followed by the description from
+.Ar descr .
+This conversion may be repeated.
+.
+.It Cm F Ar lsb Ar width Op Ar descr
+Describes a multi-bit field like
+.Sq Cm f ,
+but just extracts the value for use with the
+.Sq Cm \&:
+.Pq or, in rare cases, Sq Cm \&=
+and
+.Sq Cm \&*
+conversions below.
+The description from
+.Ar descr
+is ignored,
+it is only present for uniformity with the other conversions.
+.
+.It Cm \&: Ar cmp Ar descr
+Compares the field value from the previous
+.Sq Cm F
+.Pq or, in rare cases, Sq Cm f
+conversion to the single-byte value
+.Ar cmp ,
+ranging from
+.Ql \e000
+or
+.Ql \ex00
+(0) to
+.Ql \e377
+or
+.Ql \exff
+(255).
+If they are equal, prints the description from
+.Ar descr .
+This conversion may be repeated.
+.
+.It Cm * Ar fmt
+If none of the previous
+.Sq Cm \&=
+or
+.Sq Cm \&:
+conversions matched, prints the format string
+.Ar fmt
+via
+.Xr snprintf 3 .
+The format string
+.Ar fmt
+may contain a single
+.Vt uintmax_t
+conversion specification to print the field value that did not match.
+.El
+.Pp
+The new format is terminated by an additional
+.Tn NUL
+character at the end, following that delimiting the last conversion.
+This
+.Tn NUL
+is supplied by the compiler to terminate the string literal and
+doesn't need to be written explicitly.
+.Sh RETURN VALUES
+The
+.Fn snprintb
+and
+.Fn snprintb_m
+functions return the number of bytes that they would have written to the buffer
+if there was adequate space, excluding the final terminating NUL, or \-1 in
+case an error occurred.
+For
+.Fn snprintb_m ,
+the NUL characters terminating each individual string are included in the
+total number of bytes.
+.Sh EXAMPLES
+Two examples of the old formatting style:
+.Bd -literal -offset indent
+snprintb(buf, bufsize, "\e010\e002BITTWO\e001BITONE", 3)
+\(rA "03<BITTWO,BITONE>"
+
+snprintb(buf, bufsize,
+    "\ex10"
+    "\ex10" "NOTBOOT"
+    "\ex0f" "FPP"
+    "\ex0e" "SDVMA"
+    "\ex0c" "VIDEO"
+    "\ex0b" "LORES"
+    "\ex0a" "FPA"
+    "\ex09" "DIAG"
+    "\ex07" "CACHE"
+    "\ex06" "IOCACHE"
+    "\ex05" "LOOPBACK"
+    "\ex04" "DBGCACHE",
+    0xe860)
+\(rA "0xe860<NOTBOOT,FPP,SDVMA,VIDEO,CACHE,IOCACHE>"
+.Ed
+.Pp
+An example of the new formatting style:
+.Bd -literal -offset indent
+snprintb(buf, bufsize,
+    "\e177\e020"
+    "b\e000" "LSB\e0"
+    "b\e001" "BITONE\e0"
+    "f\e004\e004" "NIBBLE2\e0"
+    "f\e020\e004" "BURST\e0"
+        "=\ex04" "FOUR\e0"
+        "=\ex0f" "FIFTEEN\e0"
+    "b\e037" "MSB\e0",
+    0x800f0701)
+\(rA "0x800f0701<LSB,NIBBLE2=0,BURST=0xf=FIFTEEN,MSB>"
+.Ed
+.Pp
+The same example using snprintb_m:
+.Bd -literal -offset indent
+snprintb_m(buf, bufsize,
+    "\e177\e020"
+    "b\e000" "LSB\e0"
+    "b\e001" "BITONE\e0"
+    "f\e004\e004" "NIBBLE2\e0"
+    "f\e020\e004" "BURST\e0"
+        "=\ex04" "FOUR\e0"
+        "=\ex0f" "FIFTEEN\e0"
+    "b\e037" "MSB\e0",
+    0x800f0701, 34)
+\(rA "0x800f0701<LSB,NIBBLE2=0>\e0"
+   "0x800f0701<BURST=0xf=FIFTEEN,MSB>\e0"
+   ""
+.Ed
+.Pp
+A more complex example from
+.In sys/mman.h
+that uses both the single-bit
+.Sq Cm b
+formatting as well as the multi-bit field
+.Sq Cm F
+formatting with a default
+.Sq Cm \&* :
+.Bd -literal -offset indent
+#define MAP_FMT "\e177\e020"                      \e
+        "b\e0"  "SHARED\e0"                       \e
+        "b\e1"  "PRIVATE\e0"                      \e
+        "b\e2"  "COPY\e0"                         \e
+        "b\e4"  "FIXED\e0"                        \e
+        "b\e5"  "RENAME\e0"                       \e
+        "b\e6"  "NORESERVE\e0"                    \e
+        "b\e7"  "INHERIT\e0"                      \e
+        "b\e11" "HASSEMAPHORE\e0"                 \e
+        "b\e12" "TRYFIXED\e0"                     \e
+        "b\e13" "WIRED\e0"                        \e
+        "F\e14\e1\e0"                              \e
+                ":\e0" "FILE\e0"                  \e
+                ":\e1" "ANONYMOUS\e0"             \e
+        "b\e15" "STACK\e0"                        \e
+        "F\e30\e010\e0"                            \e
+                ":\e000" "ALIGN=NONE\e0"          \e
+                ":\e012" "ALIGN=1KB\e0"           \e
+                ":\e013" "ALIGN=2KB\e0"           \e
+                ":\e014" "ALIGN=4KB\e0"           \e
+                ":\e015" "ALIGN=8KB\e0"           \e
+                ":\e016" "ALIGN=16KB\e0"          \e
+                ":\e017" "ALIGN=32KB\e0"          \e
+                ":\e020" "ALIGN=64KB\e0"          \e
+                ":\e021" "ALIGN=128KB\e0"         \e
+                ":\e022" "ALIGN=256KB\e0"         \e
+                ":\e023" "ALIGN=512KB\e0"         \e
+                ":\e024" "ALIGN=1MB\e0"           \e
+                ":\e025" "ALIGN=2MB\e0"           \e
+                ":\e026" "ALIGN=4MB\e0"           \e
+                ":\e027" "ALIGN=8MB\e0"           \e
+                ":\e030" "ALIGN=16MB\e0"          \e
+                ":\e034" "ALIGN=256MB\e0"         \e
+                ":\e040" "ALIGN=4GB\e0"           \e
+                ":\e044" "ALIGN=64GB\e0"          \e
+                ":\e050" "ALIGN=1TB\e0"           \e
+                ":\e054" "ALIGN=16TB\e0"          \e
+                ":\e060" "ALIGN=256TB\e0"         \e
+                ":\e064" "ALIGN=4PB\e0"           \e
+                ":\e070" "ALIGN=64PB\e0"          \e
+                ":\e074" "ALIGN=1EB\e0"           \e
+                "*"     "ALIGN=2^%ju\e0"
+
+snprintb(buf, bufsize, MAP_FMT, 0x0d001234)
+\(rA "0xd001234<COPY,FIXED,RENAME,HASSEMAPHORE,ANONYMOUS,ALIGN=8KB>"
+
+snprintb(buf, bufsize, MAP_FMT, 0x2e000000)
+\(rA "0x2e000000<FILE,ALIGN=2^46>"
+.Ed
+.Sh ERRORS
+.Fn snprintb
+will fail if:
+.Bl -tag -width Er
+.It Bq Er EINVAL
+.Pq Only in user mode.
+The leading character
+.Po for the
+.Dq old
+format
+.Pc
+or the second character
+.Po for the
+.Dq new
+format
+.Pc
+does not describe a supported numeral base,
+or a bit number in the
+.Ar fmt
+argument is out of bounds,
+or the sequence of conversions in the
+.Ar fmt
+argument is invalid,
+or
+.Fn snprintf
+failed.
+.El
+.Sh SEE ALSO
+.Xr snprintf 3
+.Sh HISTORY
+The
+.Fn snprintb
+function was originally implemented as a non-standard
+.Li %b
+format string for the kernel
+.Fn printf
+function in
+.Nx 1.5
+and earlier releases.
+It was called
+.Fn bitmask_snprintf
+in
+.Nx 5.0
+and earlier releases.
+.Sh AUTHORS
+The
+.Dq new
+format was the invention of
+.An Chris Torek .
+.Sh CAVEATS
+When using hexadecimal character escapes for bit positions or field widths,
+if a following description starts with one of the letters A to F,
+that letter is considered part of the character escape.
+In such a situation, the character escape and the description must be
+put into separate string literals, as in
+.Li \[dq]\ex0f\[dq] \[dq]FIFTEEN\[dq] .

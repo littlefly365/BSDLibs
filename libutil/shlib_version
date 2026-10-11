@@ -1,4 +1,4 @@
-#	$NetBSD: shlib_version,v 1.6 2009/01/11 03:07:47 christos Exp $
+#	$NetBSD: shlib_version,v 1.54.30.1 2025/12/20 13:51:18 martin Exp $
 #	Remember to update distrib/sets/lists/base/shl.* when changing
 #
 major=1
