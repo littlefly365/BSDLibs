@@ -1,0 +1,22 @@
+/e_acos.S/1.6/Thu Aug  7 16:44:42 2003//Tnetbsd-11-0-RELEASE
+/e_asin.S/1.6/Thu Aug  7 16:44:42 2003//Tnetbsd-11-0-RELEASE
+/e_atanh.S/1.6/Thu Aug  7 16:44:42 2003//Tnetbsd-11-0-RELEASE
+/e_cosh.S/1.6/Thu Aug  7 16:44:42 2003//Tnetbsd-11-0-RELEASE
+/e_exp.S/1.6/Thu Aug  7 16:44:42 2003//Tnetbsd-11-0-RELEASE
+/e_fmod.S/1.4/Sat Jul 26 19:25:04 2003//Tnetbsd-11-0-RELEASE
+/e_log.S/1.6/Thu Aug  7 16:44:42 2003//Tnetbsd-11-0-RELEASE
+/e_log10.S/1.6/Thu Aug  7 16:44:42 2003//Tnetbsd-11-0-RELEASE
+/e_remainder.S/1.6/Sat Jul 26 19:25:04 2003//Tnetbsd-11-0-RELEASE
+/e_scalb.S/1.9/Sat Jul 26 19:25:05 2003//Tnetbsd-11-0-RELEASE
+/e_sinh.S/1.6/Thu Aug  7 16:44:42 2003//Tnetbsd-11-0-RELEASE
+/e_sqrt.S/1.7/Thu Aug  7 16:44:43 2003//Tnetbsd-11-0-RELEASE
+/s_atan.S/1.7/Sun Jun  9 13:33:36 2024//Tnetbsd-11-0-RELEASE
+/s_cos.S/1.7/Wed May  8 01:04:40 2024//Tnetbsd-11-0-RELEASE
+/s_expm1.S/1.6/Thu Aug  7 16:44:43 2003//Tnetbsd-11-0-RELEASE
+/s_log1p.S/1.7/Tue Jul 16 14:52:49 2024//Tnetbsd-11-0-RELEASE
+/s_logb.S/1.7/Thu Aug  7 16:44:43 2003//Tnetbsd-11-0-RELEASE
+/s_scalbn.S/1.11/Mon May 20 20:27:43 2013//Tnetbsd-11-0-RELEASE
+/s_sin.S/1.7/Wed May  8 01:04:40 2024//Tnetbsd-11-0-RELEASE
+/s_tan.S/1.7/Wed May  8 01:04:40 2024//Tnetbsd-11-0-RELEASE
+/s_tanh.S/1.6/Thu Aug  7 16:44:44 2003//Tnetbsd-11-0-RELEASE
+D

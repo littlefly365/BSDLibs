@@ -1,0 +1,11 @@
+/n_argred.S/1.10/Tue May  7 15:15:09 2024//Tnetbsd-11-0-RELEASE
+/n_atan2.S/1.11/Tue May  7 15:49:33 2024//Tnetbsd-11-0-RELEASE
+/n_cabs.S/1.9/Tue May  7 15:15:31 2024//Tnetbsd-11-0-RELEASE
+/n_cbrt.S/1.9/Tue May  7 15:15:31 2024//Tnetbsd-11-0-RELEASE
+/n_infnan.S/1.7/Tue May  7 15:15:10 2024//Tnetbsd-11-0-RELEASE
+/n_scalbn.S/1.8/Tue May  7 15:15:31 2024//Tnetbsd-11-0-RELEASE
+/n_sincos.S/1.10/Mon May  6 15:33:04 2024//Tnetbsd-11-0-RELEASE
+/n_sqrt.S/1.12/Tue May  7 15:15:10 2024//Tnetbsd-11-0-RELEASE
+/n_support.S/1.13/Wed Jul 17 12:00:48 2024//Tnetbsd-11-0-RELEASE
+/n_tan.S/1.8/Mon May  6 15:33:04 2024//Tnetbsd-11-0-RELEASE
+D
