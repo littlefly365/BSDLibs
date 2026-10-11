@@ -1,3 +1,3 @@
-SUBDIR=libc .WAIT ld.elf_so csu include
+SUBDIR=libc .WAIT libcrypt ld.elf_so csu include
 
 .include <bsd.subdir.mk>
