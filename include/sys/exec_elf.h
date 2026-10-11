@@ -1070,7 +1070,7 @@ typedef struct {
 typedef struct {
 	unsigned long a_type;
 	unsigned long a_val;
-} Auxv_t;
+} Aux64Info;
 
 /* a_type */
 #define AT_NULL			0
@@ -1447,7 +1447,7 @@ struct netbsd_elfcore_procinfo {
 #define ELF_R_TYPE	ELF64_R_TYPE
 #define ELFCLASS	ELFCLASS64
 
-#define AuxInfo		Auxv_t
+#define AuxInfo		Aux64Info
 #endif
 
 #ifndef Elf_Symindx
