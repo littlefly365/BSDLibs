@@ -41,9 +41,6 @@ __RCSID("$nlibc: lwp.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
 #define ARCH_SET_FS		0x1002
 #define ARCH_GET_FS		0x1003
 
-#define FUTEX_WAIT		0
-#define FUTEX_WAKE		1
-
 int
 _lwp_exit(void)
 {

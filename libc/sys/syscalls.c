@@ -54,86 +54,16 @@ __RCSID("$nlibc: syscalls.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
 
 #ifdef __weak_alias
 __weak_alias(read, _read);
-__weak_alias(write, _write);
-__weak_alias(open, _open);
-__weak_alias(close, _close);
-__weak_alias(poll, _poll);
 __weak_alias(lseek, _lseek);
-__weak_alias(mprotect, _mprotect);
-__weak_alias(munmap, _munmap);
 __weak_alias(brk, _brk);
 __weak_alias(sigprocmask, __sigprocmask14);
 __weak_alias(pread, _pread);
 __weak_alias(pwrite, _pwrite);
-__weak_alias(readv, _readv);
-__weak_alias(writev, _writev);
-__weak_alias(access, _access);
 __weak_alias(pipe, _pipe);
-__weak_alias(mremap, _mremap);
-__weak_alias(mincore, _mincore);
-__weak_alias(madvise, _madvise);
-__weak_alias(dup, _dup);
-__weak_alias(dup2, _dup2);
-__weak_alias(getpid, _getpid);
-__weak_alias(connect, _connect);
-__weak_alias(accept, _accept);
-__weak_alias(sendto, _sendto);
-__weak_alias(recvfrom, _recvfrom);
-__weak_alias(sendmsg, _sendmsg);
-__weak_alias(shutdown, _shutdown);
-__weak_alias(bind, _bind);
-__weak_alias(listen, _listen);
-__weak_alias(getsockname, _getsockname);
-__weak_alias(getpeername, _getpeername);
-__weak_alias(socketpair, _socketpair);
-__weak_alias(setsockopt, _setsockopt);
-__weak_alias(getsockopt, _getsockopt);
 __weak_alias(vfork, __vfork14);
-__weak_alias(execve, _execve);
 __weak_alias(kill, _kill);
-__weak_alias(fcntl, _fcntl);
-__weak_alias(flock, _flock);
-__weak_alias(fsync, _fsync);
-__weak_alias(fdatasync, _fdatasync);
-__weak_alias(truncate, _truncate);
 __weak_alias(ftruncate, _ftruncate);
-__weak_alias(chdir, _chdir);
-__weak_alias(fchdir, _fchdir);
-__weak_alias(rename, _rename)
-__weak_alias(mkdir, _mkdir);
-__weak_alias(rmdir, _rmdir);
-__weak_alias(link, _link);
-__weak_alias(unlink, _unlink);
-__weak_alias(symlink, _symlink);
 __weak_alias(readlink, _readlink);
-__weak_alias(chmod, _chmod);
-__weak_alias(fchmod, _fchmod);
-__weak_alias(chown, _chown);
-__weak_alias(fchown, _fchown);
-__weak_alias(lchown, _lchown);
-__weak_alias(umask, _umask);
-__weak_alias(getpriority, _getpriority);
-__weak_alias(setpriority, _setpriority);
-__weak_alias(getrlimit, _getrlimit);
-__weak_alias(getuid, _getuid);
-__weak_alias(getgid, _getgid);
-__weak_alias(setuid, _setuid);
-__weak_alias(setgid, _setgid);
-__weak_alias(geteuid, _geteuid);
-__weak_alias(getegid, _getegid);
-__weak_alias(setpgid, _setpgid);
-__weak_alias(getppid, _getppid);
-__weak_alias(getpgrp, _getpgrp);
-__weak_alias(setsid, _setsid);
-__weak_alias(setreuid, _setreuid);
-__weak_alias(setregid, _setregid);
-__weak_alias(getgroups, _getgroups);
-__weak_alias(setgroups, _setgroups);
-__weak_alias(setrlimit, _setrlimit);
-__weak_alias(utimensat, _utimensat);
-__weak_alias(ppoll, _ppoll);
-__weak_alias(pipe2, _pipe2);
-__weak_alias(getrandom, _getrandom);
 #endif
 
 /*
@@ -154,13 +84,13 @@ _read(int fd, void *buf, size_t len)
 }
 
 ssize_t
-_write(int fd, const void *buf, size_t len)
+write(int fd, const void *buf, size_t len)
 {
 	return syscall(SYS_write, fd, buf, len);
 }
 
 int
-_open(const char *path, int flags, ...)
+open(const char *path, int flags, ...)
 {
 	va_list ap;
 	mode_t mode;
@@ -178,7 +108,7 @@ _open(const char *path, int flags, ...)
 }
 
 int
-_close(int fd)
+close(int fd)
 {
 	return syscall(SYS_close, fd);
 }
@@ -199,7 +129,7 @@ _close(int fd)
 */
 
 int
-_poll(struct pollfd *fds, nfds_t nfds, int timeout)
+poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
 	return syscall(SYS_poll, fds, nfds, timeout);
 }
@@ -216,7 +146,7 @@ _lseek(int fd, off_t offset, int whence)
 */
 
 int
-_mprotect(void *addr, size_t len, int prot)
+mprotect(void *addr, size_t len, int prot)
 {
 	size_t start, end;
 
@@ -227,7 +157,7 @@ _mprotect(void *addr, size_t len, int prot)
 }
 
 int
-_munmap(void *start, size_t len)
+munmap(void *start, size_t len)
 {
 	return syscall(SYS_munmap, start, len);
 }
@@ -290,19 +220,19 @@ _pwrite(int fd, const void *buf, size_t count, off_t offs)
 }
 
 ssize_t
-_readv(int fd, const struct iovec *buf, int count)
+readv(int fd, const struct iovec *buf, int count)
 {
 	return syscall(SYS_readv, fd, buf, count);
 }
 
 ssize_t
-_writev(int fd, const struct iovec *buf, int count)
+writev(int fd, const struct iovec *buf, int count)
 {
 	return syscall(SYS_writev, fd, buf, count);
 }
 
 int
-_access(const char *path, int mode)
+access(const char *path, int mode)
 {
 	return syscall(SYS_access, path, mode);
 }
@@ -327,7 +257,7 @@ _sys_sched_yield(void)
 }
 
 void
-*_mremap(void *oldp, size_t oldsize, void *newp, size_t newsize, int flags)
+*mremap(void *oldp, size_t oldsize, void *newp, size_t newsize, int flags)
 {
 	if (newsize >= PTRDIFF_MAX) {
 		errno = ENOMEM;
@@ -344,13 +274,13 @@ __msync13(void *start, size_t len, int flags)
 }
 
 int
-_mincore(void *addr, size_t len, char *vec)
+mincore(void *addr, size_t len, char *vec)
 {
 	return syscall(SYS_mincore, addr, len, vec);
 }
 
 int
-_madvise(void *addr, size_t len, int advice)
+madvise(void *addr, size_t len, int advice)
 {
 	return syscall(SYS_madvise, addr, len, advice);
 }
@@ -371,13 +301,13 @@ _madvise(void *addr, size_t len, int advice)
 */
 
 int
-_dup(int fd)
+dup(int fd)
 {
 	return syscall(SYS_dup, fd);
 }
 
 int
-_dup2(int oldfd, int newfd)
+dup2(int oldfd, int newfd)
 {
 	int ret;
 	while ((ret = syscall(SYS_dup2, oldfd, newfd)) == -1 && errno == EBUSY);
@@ -413,7 +343,7 @@ __setitimer50(int which, const struct itimerval *restrict new, struct itimerval 
 }
 
 pid_t
-_getpid(void)
+getpid(void)
 {
 	return syscall(SYS_getpid);
 }
@@ -430,32 +360,32 @@ __socket30(int domain, int type, int prot)
 }
 
 int
-_connect(int socket, const struct sockaddr *addr, socklen_t len)
+connect(int socket, const struct sockaddr *addr, socklen_t len)
 {
 	return syscall(SYS_connect, socket, addr, len);
 }
 
 int
-_accept(int socket, struct sockaddr *restrict addr, socklen_t *restrict len)
+accept(int socket, struct sockaddr *restrict addr, socklen_t *restrict len)
 {
 	return syscall(SYS_connect, socket, addr, len);
 }
 
 ssize_t
-_sendto(int socket, const void *msg, size_t len, int flags, const struct sockaddr *daddr, socklen_t dlen)
+sendto(int socket, const void *msg, size_t len, int flags, const struct sockaddr *daddr, socklen_t dlen)
 {
 	return syscall(SYS_sendto, socket, msg, len, flags, daddr, dlen);
 }
 
 ssize_t
-_recvfrom(int s, void *restrict buf, size_t len, int flags, struct sockaddr *restrict from, 
+recvfrom(int s, void *restrict buf, size_t len, int flags, struct sockaddr *restrict from, 
 	socklen_t *restrict fromlen)
 {
 	return syscall(SYS_recvfrom, s, buf, len, flags, from, fromlen);
 }
 
 ssize_t
-_sendmsg(int socket, const struct msghdr *msg, int flags)
+sendmsg(int socket, const struct msghdr *msg, int flags)
 {
 	return syscall(SYS_sendmsg, socket, msg, flags);
 }
@@ -466,49 +396,49 @@ _sendmsg(int socket, const struct msghdr *msg, int flags)
 */
 
 int
-_shutdown(int sockfd, int how)
+shutdown(int sockfd, int how)
 {
 	return syscall(SYS_shutdown, sockfd, how);
 }
 
 int
-_bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
 	return syscall(SYS_bind, sockfd, addr, addrlen);
 }
 
 int
-_listen(int sockfd, int backlog)
+listen(int sockfd, int backlog)
 {
 	return syscall(SYS_listen, sockfd, backlog);
 }
 
 int
-_getsockname(int fd, struct sockaddr *restrict addr, socklen_t *restrict len)
+getsockname(int fd, struct sockaddr *restrict addr, socklen_t *restrict len)
 {
 	return syscall(SYS_getsockname, fd, addr, len);
 }
 
 int
-_getpeername(int fd, struct sockaddr *restrict addr, socklen_t *restrict len)
+getpeername(int fd, struct sockaddr *restrict addr, socklen_t *restrict len)
 {
 	return syscall(SYS_getpeername, fd, addr, len);
 }
 
 int
-_socketpair(int domain, int type, int prot, int sv[2])
+socketpair(int domain, int type, int prot, int sv[2])
 {
 	return syscall(SYS_socketpair, domain, type, prot, sv);
 }
 
 int
-_setsockopt(int fd, int level, int optname, const void *optval, socklen_t len)
+setsockopt(int fd, int level, int optname, const void *optval, socklen_t len)
 {
 	return syscall(SYS_getsockopt, fd, level, optname, optval, len);
 }
 
 int
-_getsockopt(int fd, int level, int optname, void *optval, socklen_t *len)
+getsockopt(int fd, int level, int optname, void *optval, socklen_t *len)
 {
 	return syscall(SYS_getsockopt, fd, level, optname, optval, len);
 }
@@ -533,7 +463,7 @@ __fork(void)
 }
 
 int
-_execve(const char *path, char *const argv[], char *const envp[])
+execve(const char *path, char *const argv[], char *const envp[])
 {
 	return syscall(SYS_execve, path, argv, envp);
 }
@@ -608,7 +538,7 @@ _semop(int id, struct sembuf *buf, size_t n)
 */
 
 int
-_fcntl(int fd, int cmd, ...)
+fcntl(int fd, int cmd, ...)
 {
 	u_long arg;
 	va_list ap;
@@ -621,25 +551,25 @@ _fcntl(int fd, int cmd, ...)
 }
 
 int
-_flock(int fd, int op)
+flock(int fd, int op)
 {
 	return syscall(SYS_flock, fd, op);
 }
 
 int
-_fsync(int fd)
+fsync(int fd)
 {
 	return syscall(SYS_fsync, fd);
 }
 
 int
-_fdatasync(int fd)
+fdatasync(int fd)
 {
 	return syscall(SYS_fdatasync, fd);
 }
 
 int
-_truncate(const char *path, off_t offset)
+truncate(const char *path, off_t offset)
 {
 	return syscall(SYS_truncate, path, offset);
 }
@@ -662,31 +592,31 @@ __getcwd(char *buf, size_t len)
 }
 
 int
-_chdir(const char *path)
+chdir(const char *path)
 {
 	return syscall(SYS_chdir, path);
 }
 
 int
-_fchdir(int fd)
+fchdir(int fd)
 {
 	return syscall(SYS_fchdir, fd);
 }
 
 int
-_rename(const char *old, const char *new)
+rename(const char *old, const char *new)
 {
 	return syscall(SYS_rename, old, new);
 }
 
 int
-_mkdir(const char *path, mode_t mode)
+mkdir(const char *path, mode_t mode)
 {
 	return syscall(SYS_mkdir, path, mode);
 }
 
 int
-_rmdir(const char *path)
+rmdir(const char *path)
 {
 	return syscall(SYS_rmdir, path);
 }
@@ -697,19 +627,19 @@ _rmdir(const char *path)
 */
 
 int
-_link(const char *old, const char *new)
+link(const char *old, const char *new)
 {
 	return syscall(SYS_link, old, new);
 }
 
 int
-_unlink(const char *path)
+unlink(const char *path)
 {
 	return syscall(SYS_unlink, path);
 }
 
 int
-_symlink(const char *old, const char *new)
+symlink(const char *old, const char *new)
 {
 	return syscall(SYS_symlink, old, new);
 }
@@ -721,37 +651,37 @@ _readlink(const char *path, char *buf, size_t len)
 }
 
 int
-_chmod(const char *path, mode_t mode)
+chmod(const char *path, mode_t mode)
 {
 	return syscall(SYS_chmod, path, mode);
 }
 
 int
-_fchmod(int fd, mode_t mode)
+fchmod(int fd, mode_t mode)
 {
 	return syscall(SYS_fchmod, fd, mode);
 }
 
 int
-_chown(const char *path, uid_t owner, gid_t group)
+chown(const char *path, uid_t owner, gid_t group)
 {
 	return syscall(SYS_chown, path, owner, group);
 }
 
 int
-_fchown(int fd, uid_t owner, gid_t group)
+fchown(int fd, uid_t owner, gid_t group)
 {
 	return syscall(SYS_chown, fd, owner, group);
 }
 
 int
-_lchown(const char *path, uid_t owner, gid_t group)
+lchown(const char *path, uid_t owner, gid_t group)
 {
 	return syscall(SYS_lchown, path, owner, group);
 }
 
 mode_t
-_umask(mode_t umask)
+umask(mode_t umask)
 {
 	return syscall(SYS_umask, umask);
 }
@@ -763,7 +693,7 @@ __gettimeofday50(struct timeval *restrict tv, void *restrict tz)
 }
 
 int
-_getrlimit(int resource, struct rlimit *rlim)
+getrlimit(int resource, struct rlimit *rlim)
 {
 	return syscall(SYS_prlimit64, 0, resource, 0, rlim);
 }
@@ -780,7 +710,7 @@ __getrusage50(int who, struct rusage *ru)
 */
 
 uid_t
-_getuid(void)
+getuid(void)
 {
 	return syscall(SYS_getuid);
 }
@@ -791,13 +721,13 @@ _getuid(void)
 */
 
 gid_t
-_getgid(void)
+getgid(void)
 {
 	return syscall(SYS_getgid);
 }
 
 int
-_setuid(uid_t uid)
+setuid(uid_t uid)
 {
 	if (!__isthreaded)
 		return syscall(SYS_setuid, uid);
@@ -805,7 +735,7 @@ _setuid(uid_t uid)
 }
 
 int
-_setgid(gid_t gid)
+setgid(gid_t gid)
 {
 	if (!__isthreaded)
 		return syscall(SYS_setgid, gid);
@@ -813,25 +743,25 @@ _setgid(gid_t gid)
 }
 
 uid_t
-_geteuid(void)
+geteuid(void)
 {
 	return syscall(SYS_geteuid);
 }
 
 gid_t
-_getegid(void)
+getegid(void)
 {
 	return syscall(SYS_getegid);
 }
 
 int
-_setpgid(pid_t pid, pid_t pgid)
+setpgid(pid_t pid, pid_t pgid)
 {
 	return syscall(SYS_setpgid, pid, pgid);
 }
 
 pid_t
-_getppid(void)
+getppid(void)
 {
 	return syscall(SYS_getppid);
 }
@@ -843,31 +773,31 @@ _getpgrp(void)
 }
 
 pid_t
-_setsid(void)
+setsid(void)
 {
 	return syscall(SYS_setsid);
 }
 
 int
-_setreuid(uid_t ruid, uid_t euid)
+setreuid(uid_t ruid, uid_t euid)
 {
 	return syscall(SYS_setreuid, ruid, euid);
 }
 
 int
-_setregid(gid_t rgid, gid_t egid)
+setregid(gid_t rgid, gid_t egid)
 {
 	return syscall(SYS_setregid, rgid, egid);
 }
 
 int
-_getgroups(int gidsetlen, gid_t *gidset)
+getgroups(int gidsetlen, gid_t *gidset)
 {
 	return syscall(SYS_getgroups, gidsetlen, gidset);
 }
 
 int
-_setgroups(size_t n, const gid_t *groups)
+setgroups(int n, const gid_t *groups)
 {
 	if (!__isthreaded)
 		return syscall(SYS_setgroups, n, groups);
@@ -908,7 +838,7 @@ __mknod50(const char *path, mode_t mode, dev_t dev)
 */
 
 int
-_getpriority(int which, id_t who)
+getpriority(int which, id_t who)
 {
 	int ret;
 	if ((ret = syscall(SYS_getpriority, which, who)) < 0)
@@ -917,7 +847,7 @@ _getpriority(int which, id_t who)
 }
 
 int
-_setpriority(int which, id_t who, int prio)
+setpriority(int which, id_t who, int prio)
 {
 	return syscall(SYS_setpriority, which, who, prio);
 }
@@ -928,7 +858,7 @@ _setpriority(int which, id_t who, int prio)
 */
 
 int
-_setrlimit(int resource, const struct rlimit *rlim)
+setrlimit(int resource, const struct rlimit *rlim)
 {
         return syscall(SYS_prlimit64, 0, resource, rlim, 0);
 }
@@ -979,16 +909,16 @@ __clock_getres50(clockid_t clk, struct timespec *ts)
 */
 
 int
-_utimensat(int fd, const char *path, const struct timespec times[2], int flags)
+utimensat(int fd, const char *path, const struct timespec times[2], int flags)
 {
 	return syscall(SYS_utimensat, fd, path, times, flags);
 }
 
 #ifdef __strong_alias
-__strong_alias(__pollts50, _ppoll);
+__strong_alias(__pollts50, ppoll);
 #endif
 int
-_ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout, const sigset_t *sigmask)
+ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout, const sigset_t *sigmask)
 {
 	return syscall(SYS_ppoll, fds, nfds, timeout, sigmask);
 }
@@ -1014,7 +944,7 @@ __dup3100(int oldfd, int newfd, int flags)
 }
 
 int
-_pipe2(int fd[2], int flags)
+pipe2(int fd[2], int flags)
 {
 	return syscall(SYS_pipe2, fd, flags);
 }
@@ -1025,7 +955,7 @@ _pipe2(int fd[2], int flags)
 */
 
 ssize_t
-_getrandom(void *buf, size_t len, unsigned flags)
+getrandom(void *buf, size_t len, unsigned flags)
 {
 	return syscall(SYS_getrandom, buf, len, flags);
 }

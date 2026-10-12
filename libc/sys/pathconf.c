@@ -53,7 +53,7 @@ pathconf(const char *path, int name)
 	if ((ret = fstatvfs(fd, &st)) != 0 && errno == EBADFD)
 #else
 	if (path == NULL) {
-		errno = EINVAL;
+		errno = EFAULT;
 		return -1;
 	}
 
