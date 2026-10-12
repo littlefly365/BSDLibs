@@ -120,7 +120,7 @@ stat(const char *path, struct stat *restrict stat)
 int
 fstat(int fd, struct stat *restrict stat)
 {
-	return fstatat(fd, "", stat, 0x1000);
+	return fstatat(fd, "", stat, AT_EMPTY_PATH);
 }
 
 int

@@ -1,8 +1,8 @@
 .PATH: ${ARCHDIR}/sys ${.CURDIR}/sys
 
-SRCS+=	eventfd_read.c eventfd_write.c fh.c fpathconf.c futimens.c getdents.c \
+SRCS+=	eventfd_read.c eventfd_write.c fh.c fexecve.c futimens.c getdents.c \
 	getvfsstat.c ioctl.c issetugid.c kqueue.c login.c mmap.c posix_madvise.c \
-	pathconf.c lwp.c minherit.c sbrk.c setxid.c sigaction.c \
+	pathconf.c lwp.c minherit.c sbrk.c setexid.c sigaction.c \
 	stat.c statvfs1.c statvfs.c syscall.c syscalls.c __sysctl.c utimes.c \
 	utrace.c uuidgen.c vadvise.c mkfifo.c
 

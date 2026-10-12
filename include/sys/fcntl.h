@@ -363,6 +363,12 @@ int	 posix_fallocate(int, off_t, off_t);
 int	openat(int, const char *, int, ...);
 #endif
 
+/*
+ * Linux Macros missing in NetBSD
+*/
+
+#define AT_EMPTY_PATH	0x1000
+
 __END_DECLS
 #endif /* !_KERNEL */
 

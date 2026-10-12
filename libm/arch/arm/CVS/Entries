@@ -1,9 +1,0 @@
-/e_sqrt.S/1.1/Sun Feb  3 07:13:07 2013//Tnetbsd-11-0-RELEASE
-/e_sqrtf.S/1.1/Sun Feb  3 07:13:07 2013//Tnetbsd-11-0-RELEASE
-/fenv.c/1.9/Mon May  8 09:25:03 2017//Tnetbsd-11-0-RELEASE
-/lrint.S/1.2/Thu Mar 16 16:32:12 2017//Tnetbsd-11-0-RELEASE
-/lrintf.S/1.2/Thu Mar 16 16:32:12 2017//Tnetbsd-11-0-RELEASE
-/s_fabsf.S/1.2/Thu Feb 14 09:27:26 2013//Tnetbsd-11-0-RELEASE
-/s_fma.S/1.1/Mon Feb 11 17:41:13 2013//Tnetbsd-11-0-RELEASE
-/s_fmaf.S/1.1/Mon Feb 11 17:41:13 2013//Tnetbsd-11-0-RELEASE
-D

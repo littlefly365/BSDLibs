@@ -1,4 +1,4 @@
-/*    $nlibc: pathconf.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+/*    $nlibc: pathconf.c,v 1.1 2026/10/12 11:49:05 littlefly365 Exp $    */
 
 /*
  * Copyright (c) 2026, littlefly365
@@ -31,7 +31,7 @@
 
 #include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
-__RCSID("$nlibc: pathconf.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+__RCSID("$nlibc: pathconf.c,v 1.1 2026/10/12 11:49:05 littlefly365 Exp $");
 #endif /* LIBC_SCCS and not lint */
 
 #include <sys/syslimits.h>
@@ -40,32 +40,9 @@ __RCSID("$nlibc: pathconf.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
 #include <unistd.h>
 #include <errno.h>
 
-long
-#ifdef _FPATHCONF
-fpathconf(int fd, int name)
-#else
-pathconf(const char *path, int name)
-#endif
+static int
+__pathconf(int name)
 {
-	int ret;
-	struct statvfs st;
-#ifdef _FPATHCONF
-	if ((ret = fstatvfs(fd, &st)) != 0 && errno == EBADFD)
-#else
-	if (path == NULL) {
-		errno = EFAULT;
-		return -1;
-	}
-
-	if (strlen(path) > PATH_MAX) {
-		errno = ENAMETOOLONG;
-		return -1;
-	}
-
-	if ((ret = statvfs(path, &st)) != 0 && errno == ENOENT)
-#endif
-		return -1;
-
 	switch (name) {
 	case _PC_LINK_MAX:
 		return LINK_MAX;
@@ -74,9 +51,7 @@ pathconf(const char *path, int name)
 	case _PC_MAX_INPUT:
 		return MAX_INPUT;
 	case _PC_NAME_MAX:
-		if (ret != 0)
-			return NAME_MAX;
-		return st.f_namemax;
+		return NAME_MAX;
 	case _PC_PATH_MAX:
 		return PATH_MAX;
 	case _PC_PIPE_BUF:
@@ -109,4 +84,26 @@ pathconf(const char *path, int name)
 
 	errno = EINVAL;
 	return -1;
+}
+
+/*
+ * TODO: Use path/fd when is possible
+*/
+
+int
+pathconf(const char *path __unused, int name)
+{
+	return __pathconf(name);
+}
+
+int
+fpathconf(int fd __unused, int name)
+{
+	return __pathconf(name);
+}
+
+int
+lpathconf(const char *path __unused, int name)
+{
+	return __pathconf(name);
 }

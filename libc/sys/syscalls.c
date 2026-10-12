@@ -1,4 +1,4 @@
-/*    $nlibc: syscalls.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $    */
+/*    $nlibc: syscalls.c,v 1.1 2026/10/12 11:49:05 littlefly365 Exp $    */
 
 /*
  * Copyright (c) 2026, littlefly365
@@ -31,7 +31,7 @@
 
 #include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
-__RCSID("$nlibc: syscalls.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
+__RCSID("$nlibc: syscalls.c,v 1.1 2026/10/12 11:49:05 littlefly365 Exp $");
 #endif /* LIBC_SCCS and not lint */
 
 #include <machine/vmparam.h>
@@ -52,18 +52,10 @@ __RCSID("$nlibc: syscalls.c,v 1.0 2026/10/11 11:47:10 littlefly365 Exp $");
 #include <time.h>
 #include "reentrant.h"
 
-#ifdef __weak_alias
-__weak_alias(read, _read);
-__weak_alias(lseek, _lseek);
-__weak_alias(brk, _brk);
-__weak_alias(sigprocmask, __sigprocmask14);
-__weak_alias(pread, _pread);
-__weak_alias(pwrite, _pwrite);
-__weak_alias(pipe, _pipe);
-__weak_alias(vfork, __vfork14);
-__weak_alias(kill, _kill);
-__weak_alias(ftruncate, _ftruncate);
-__weak_alias(readlink, _readlink);
+#if !defined(__weak_alias)
+#error "__weak_alias is not defined"
+#elif !defined(__strong_alias)
+#error "__strong_alias is not defined"
 #endif
 
 /*
@@ -77,6 +69,7 @@ __weak_alias(readlink, _readlink);
  * FIXME: setuid, setgid, setgroups (threads)
 */
 
+__weak_alias(read, _read);
 ssize_t
 _read(int fd, void *buf, size_t len)
 {
@@ -134,6 +127,7 @@ poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	return syscall(SYS_poll, fds, nfds, timeout);
 }
 
+__weak_alias(lseek, _lseek);
 off_t
 _lseek(int fd, off_t offset, int whence)
 {
@@ -163,9 +157,9 @@ munmap(void *start, size_t len)
 }
 
 extern char _end;
-
 char *__minbrk = &_end;
 
+__weak_alias(brk, _brk);
 int
 _brk(void *addr)
 {
@@ -182,9 +176,10 @@ _brk(void *addr)
 
 /*
  * syscall: 13
- * SYS_rt_sigaction (__sigaction_siginfo.c)
+ * SYS_rt_sigaction (sigaction.c)
 */
 
+__weak_alias(sigprocmask, __sigprocmask14);
 int
 __sigprocmask14(int how, const sigset_t *set, sigset_t *oset)
 {
@@ -207,12 +202,14 @@ __sigprocmask14(int how, const sigset_t *set, sigset_t *oset)
  * SYS_ioctl (ioctl.c)
 */
 
+__weak_alias(pread, _pread);
 ssize_t
 _pread(int fd, void *buf, size_t count, off_t offs)
 {
 	return syscall(SYS_pread64, fd, buf, count, offs);
 }
 
+__weak_alias(pwrite, _pwrite);
 ssize_t
 _pwrite(int fd, const void *buf, size_t count, off_t offs)
 {
@@ -237,6 +234,7 @@ access(const char *path, int mode)
 	return syscall(SYS_access, path, mode);
 }
 
+__weak_alias(pipe, _pipe);
 int
 _pipe(int fd[2])
 {
@@ -448,9 +446,8 @@ getsockopt(int fd, int level, int optname, void *optval, socklen_t *len)
  * (not implemented)
 */
 
-#ifdef __strong_alias
+__weak_alias(vfork, __vfork14)
 __strong_alias(__vfork14, __fork);
-#endif
 pid_t
 __fork(void)
 {
@@ -468,9 +465,7 @@ execve(const char *path, char *const argv[], char *const envp[])
 	return syscall(SYS_execve, path, argv, envp);
 }
 
-#ifdef __strong_alias
 __strong_alias(_Exit, _exit);
-#endif
 void __dead
 _exit(int code)
 {
@@ -484,6 +479,7 @@ __wait450(pid_t pid, int *wstatus, int options, struct rusage *rusage)
 	return syscall(SYS_wait4, pid, wstatus, options, rusage);
 }
 
+__weak_alias(kill, _kill);
 int
 _kill(pid_t pid, int nsig)
 {
@@ -574,6 +570,7 @@ truncate(const char *path, off_t offset)
 	return syscall(SYS_truncate, path, offset);
 }
 
+__weak_alias(ftruncate, _ftruncate);
 int
 _ftruncate(int fd, off_t offset)
 {
@@ -644,6 +641,7 @@ symlink(const char *old, const char *new)
 	return syscall(SYS_symlink, old, new);
 }
 
+__weak_alias(readlink, _readlink);
 ssize_t
 _readlink(const char *path, char *buf, size_t len)
 {
@@ -662,18 +660,21 @@ fchmod(int fd, mode_t mode)
 	return syscall(SYS_fchmod, fd, mode);
 }
 
+__weak_alias(__posix_chown, chown);
 int
 chown(const char *path, uid_t owner, gid_t group)
 {
 	return syscall(SYS_chown, path, owner, group);
 }
 
+__weak_alias(__posix_fchown, fchown);
 int
 fchown(int fd, uid_t owner, gid_t group)
 {
 	return syscall(SYS_chown, fd, owner, group);
 }
 
+__weak_alias(__posix_lchown, lchown);
 int
 lchown(const char *path, uid_t owner, gid_t group)
 {
@@ -904,7 +905,79 @@ __clock_getres50(clockid_t clk, struct timespec *ts)
 }
 
 /*
- * syscalls: 230-249
+ * syscalls: 230-259
+ * (not implemented)
+*/
+
+int
+fchownat(int fd, const char *path, uid_t owner, gid_t group, int flags)
+{
+	return syscall(SYS_fchownat, fd, path, owner, group, flags);
+}
+
+/*
+ * syscalls: 261-262
+ * (not implemented)
+*/
+
+int
+unlinkat(int fd, const char *path, int flags)
+{
+	return syscall(SYS_unlinkat, fd, path, flags);
+}
+
+int
+renameat(int oldfd, const char *oldpath, int newfd, const char *newpath)
+{
+	return syscall(SYS_renameat, oldfd, oldpath, newfd, newpath);
+}
+
+int
+linkat(int oldfd, const char *oldpath, int newfd, const char *newpath, int flags)
+{
+	return syscall(SYS_linkat, olfd, oldpath, newfd, newpath, flags);
+}
+
+int
+symlinkat(const char *oldpath, int newfd, const char *newpath)
+{
+	return syscall(SYS_symlinkat, olfpath, newfd, newpath);
+}
+
+ssize_t
+readlinkat(int fd, const char *restrict path, char *buf, size_t len)
+{
+	return syscall(SYS_readlink, fd, path, buf, len);
+}
+
+/*
+ * syscall: 268
+ * (not implemented)
+*/
+
+int
+faccessat(int fd, const char *path, int amode, int flag)
+{
+	return syscall(SYS_facccessat, fd, path, amode, flag);
+}
+
+int
+__pselect50(int n, fd_set *restrict rfds, fd_set *restrict wfds, fd_set *restrict efds, const struct timespec *restrict ts,
+	const sigset *restrict mask)
+{
+        long data[2] = { (uintptr_t)mask, 8 };
+        return syscall(SYS_pselect6, n, rfds, wfds, efds, (ts) ? ((long[]){ts->tv_sec, ts->tv_nsec}) : 0, data);
+}
+
+__strong_alias(__pollts50, ppoll);
+int
+ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout, const sigset_t *sigmask)
+{
+	return syscall(SYS_ppoll, fds, nfds, timeout, sigmask);
+}
+
+/*
+ * syscalls: 272-279
  * (not implemented)
 */
 
@@ -912,22 +985,6 @@ int
 utimensat(int fd, const char *path, const struct timespec times[2], int flags)
 {
 	return syscall(SYS_utimensat, fd, path, times, flags);
-}
-
-#ifdef __strong_alias
-__strong_alias(__pollts50, ppoll);
-#endif
-int
-ppoll(struct pollfd *fds, nfds_t nfds, const struct timespec *timeout, const sigset_t *sigmask)
-{
-	return syscall(SYS_ppoll, fds, nfds, timeout, sigmask);
-}
-
-int
-__pselect50(int n, fd_set *restrict rfds, fd_set *restrict wfds, fd_set *restrict efds, const struct timespec *restrict ts, const sigset_t *restrict mask)
-{
-	long data[2] = { (uintptr_t)mask, 8 };
-	return syscall(SYS_select, n, rfds, wfds, efds, (ts) ? ((long[]){ts->tv_sec, ts->tv_nsec}) : 0, data);
 }
 
 /*
@@ -961,6 +1018,11 @@ getrandom(void *buf, size_t len, unsigned flags)
 }
 
 /*
- * syscalls: 319-470
+ * syscalls: 319-322
+ * (not implemented)
+*/
+
+/*
+ * syscalls: 323-470
  * (not implemented)
 */
